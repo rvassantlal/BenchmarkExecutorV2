@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -354,13 +355,14 @@ public class ThroughputLatencyBenchmarkStrategy implements IBenchmarkStrategy, I
 
 	private void sleepSeconds(long duration) throws InterruptedException {
 		lock.lock();
-		Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+		ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+		scheduledExecutorService.schedule(() -> {
 			lock.lock();
 			sleepCondition.signal();
 			lock.unlock();
 		}, duration, TimeUnit.SECONDS);
 		sleepCondition.await();
-		Executors.newSingleThreadExecutor().shutdown();
+		scheduledExecutorService.shutdown();
 		lock.unlock();
 	}
 }
