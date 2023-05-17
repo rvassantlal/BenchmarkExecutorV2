@@ -40,6 +40,8 @@ public final class Configuration {
                 case "controller.listening.port":
                 case "global.worker.machines":
                 case "controller.benchmark.strategy":
+                case "controller.worker.setup":
+                case "controller.worker.processor":
                     continue;
             }
             benchmarkParameters.put(key, value);
