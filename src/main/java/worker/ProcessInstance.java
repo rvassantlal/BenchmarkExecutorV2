@@ -16,7 +16,7 @@ public class ProcessInstance extends Thread {
 		super("Worker Thread");
 		this.eventTrigger = eventTrigger;
 		this.eventProcessor = eventProcessor;
-		System.out.printf("Starting %s\n", command);
+		System.out.printf("Executing '%s'\n", command);
 		this.process = Runtime.getRuntime().exec(command, null, new File(workingDir));
 	}
 

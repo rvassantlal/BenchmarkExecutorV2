@@ -65,10 +65,12 @@ public class Worker extends Thread {
 						int maxWaitBetweenProcesses = Math.max(1, startProcessMessage.getMaxWaitBetweenProcessInstances());
 						for (ProcessInformation process : startProcessMessage.getProcesses()) {
 							ProcessInstance processInstance = createProcessInstance(sender, process, workerEventProcessorClass);
-							processInstances.add(processInstance);
-							processInstance.start();
-							int sleepTime = rndGenerator.nextInt(maxWaitBetweenProcesses);
-							Thread.sleep(sleepTime);
+							if (processInstance != null) {
+								processInstances.add(processInstance);
+								processInstance.start();
+								int sleepTime = rndGenerator.nextInt(maxWaitBetweenProcesses);
+								Thread.sleep(sleepTime);
+							}
 						}
 						break;
 					case STOP_WORKER:
@@ -108,32 +110,34 @@ public class Worker extends Thread {
 	}
 
 	private ProcessInstance createProcessInstance(SynchronizedSender sender, ProcessInformation processInfo,
-												  Class<?> workerEventProcessorClass) throws InvocationTargetException, InstantiationException, IllegalAccessException, IOException {
+												  Class<?> workerEventProcessorClass) {
 		String command = processInfo.getCommand();
 		String workingDir = processInfo.getWorkingDirectory();
+		try {
+			IWorkerEventProcessor eventProcessor = createEventProcessorInstance(workerEventProcessorClass);
+			EventTrigger eventTrigger = new EventTrigger() {
+				@Override
+				void readyEvent() {
+					int v = numReadProcessInstances.incrementAndGet();
+					if (v == totalProcessInstances)
+						sender.send(new StandardMessage(MessageType.WORKER_READY));
+				}
 
-		IWorkerEventProcessor eventProcessor = createEventProcessorInstance(workerEventProcessorClass);
+				@Override
+				void processEnded() {
+					sender.send(new StandardMessage(MessageType.WORKER_ENDED));
+				}
 
-		EventTrigger eventTrigger = new EventTrigger() {
-			@Override
-			void readyEvent() {
-				int v = numReadProcessInstances.incrementAndGet();
-				if (v == totalProcessInstances)
-					sender.send(new StandardMessage(MessageType.WORKER_READY));
-			}
-
-			@Override
-			void processEnded() {
-				sender.send(new StandardMessage(MessageType.WORKER_ENDED));
-			}
-
-			@Override
-			void error(String errorMessage) {
-				sender.send(new ErrorMessage(errorMessage));
-			}
-		};
-
-		return new ProcessInstance(workingDir, command, eventTrigger, eventProcessor);
+				@Override
+				void error(String errorMessage) {
+					sender.send(new ErrorMessage(errorMessage));
+				}
+			};
+			return new ProcessInstance(workingDir, command, eventTrigger, eventProcessor);
+		} catch (IOException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+			sender.send(new ErrorMessage("Failed to execute " + command + ": " + e.getMessage()));
+		}
+		return null;
 	}
 
 	private static IWorkerEventProcessor createEventProcessorInstance(Class<?> workerEventProcessorClass) throws InvocationTargetException, InstantiationException, IllegalAccessException {

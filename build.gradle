@@ -1,32 +1,32 @@
 plugins {
-    id 'java'
-    id 'distribution'
+	id 'java'
+	id 'distribution'
 }
 
 group 'org.example'
 version '1.0'
 
 compileJava {
-    sourceCompatibility = 8
-    targetCompatibility = 8
+	sourceCompatibility = 8
+	targetCompatibility = 8
 }
 
 jar {
-    archivesBaseName=project.name
-    project.version=""
+	archivesBaseName=project.name
+	project.version=""
 }
 
 distributions {
-    main {
-        contents{
-            from 'benchmark.config'
-            from jar
-        }
-    }
+	main {
+		contents{
+			from 'benchmark.config'
+			from jar
+		}
+	}
 }
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
