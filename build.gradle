@@ -12,7 +12,7 @@ compileJava {
 }
 
 jar {
-	archivesBaseName=project.name
+	archivesBaseName="BenchmarkExecutor"
 	project.version=""
 }
 
