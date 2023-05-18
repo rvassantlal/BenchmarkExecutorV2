@@ -44,7 +44,7 @@ public class BenchmarkController extends Thread {
 
 		benchmarkStrategy.executeBenchmark(workerHandlers, configuration.getBenchmarkParameters());
 		shutdown();
-		//System.out.println("Exiting BenchmarkController");
+		System.out.println("Exiting BenchmarkController");
 	}
 
 	void addNewWorker(Socket connection) throws IOException {

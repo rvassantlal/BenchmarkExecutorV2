@@ -107,6 +107,7 @@ public class Worker extends Thread {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("Exiting Worker");
 	}
 
 	private ProcessInstance createProcessInstance(SynchronizedSender sender, ProcessInformation processInfo,
