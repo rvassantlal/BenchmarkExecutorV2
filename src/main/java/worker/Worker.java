@@ -1,6 +1,8 @@
 package worker;
 
 import messages.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.SocketFactory;
 import java.io.*;
@@ -12,6 +14,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Worker extends Thread {
+	private final Logger logger = LoggerFactory.getLogger("benchmark.worker");
 	private final Socket socket;
 	private final LinkedList<ProcessInstance> processInstances;
 	private int totalProcessInstances;
@@ -23,8 +26,7 @@ public class Worker extends Thread {
 		this.socket = SocketFactory.getDefault().createSocket(controllerIP, controllerPort);
 		String localBoundedIp = socket.getLocalAddress().getHostAddress();
 		int localBoundedPort = socket.getLocalPort();
-		System.out.printf("Connected from %s:%d to %s:%d%n", localBoundedIp, localBoundedPort,
-				controllerIP, controllerPort);
+		logger.info("Connected from {}:{} to {}:{}", localBoundedIp, localBoundedPort, controllerIP, controllerPort);
 		this.processInstances = new LinkedList<>();
 		this.rndGenerator = new Random();
 		this.numReadProcessInstances = new AtomicInteger(0);
@@ -40,7 +42,7 @@ public class Worker extends Thread {
 			boolean doWork = true;
 			while (doWork) {
 				Message message = (Message) in.readObject();
-				//System.out.printf("Received message: %s\n", message.getType());
+				logger.debug("Received message: {}", message.getType());
 				switch (message.getType()) {
 					case TERMINATE_WORKER:
 						doWork = false;
@@ -98,16 +100,16 @@ public class Worker extends Thread {
 			}
 		} catch (IOException | ClassNotFoundException | InvocationTargetException | InstantiationException |
 				 IllegalAccessException | InterruptedException e) {
-			e.printStackTrace();
+			logger.error("Error while reading message from controller", e);
 		} finally {
 			try {
 				socket.close();
 				processInstances.forEach(ProcessInstance::shutdown);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Error while closing socket", e);
 			}
 		}
-		System.out.println("Exiting Worker");
+		logger.debug("Exiting Worker");
 	}
 
 	private ProcessInstance createProcessInstance(SynchronizedSender sender, ProcessInformation processInfo,

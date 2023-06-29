@@ -1,12 +1,15 @@
 package controller;
 
 import messages.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import worker.ProcessInformation;
 
 import java.io.*;
 import java.net.Socket;
 
 public class WorkerHandler extends Thread {
+	private final Logger logger = LoggerFactory.getLogger("benchmark.controller");
 	private final int workerId;
 	private final Socket connection;
 	private final ObjectOutput out;
@@ -42,7 +45,7 @@ public class WorkerHandler extends Thread {
 						workerStatusListener.onError(workerId, ((ErrorMessage)msg).getErrorMessage());
 						break;
 					default:
-						System.err.println("Unexpected value: " + msg.getType());
+						logger.error("Unexpected value: " + msg.getType());
 						isWork = false;
 				}
 			}

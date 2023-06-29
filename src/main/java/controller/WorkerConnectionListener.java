@@ -1,11 +1,15 @@
 package controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class WorkerConnectionListener extends Thread {
+	private final Logger logger = LoggerFactory.getLogger("benchmark.controller");
 	private final ServerSocket serverSocket;
 	private final BenchmarkController benchmarkController;
 
@@ -14,7 +18,7 @@ public class WorkerConnectionListener extends Thread {
 		this.benchmarkController = benchmarkController;
 		this.serverSocket = new ServerSocket();
 		this.serverSocket.bind(new InetSocketAddress(listeningIP, listeningPort));
-		System.out.printf("I am listening at %s:%d\n", listeningIP, listeningPort);
+		logger.info("I am listening at {}:{}", listeningIP, listeningPort);
 	}
 
 	@Override
@@ -28,7 +32,7 @@ public class WorkerConnectionListener extends Thread {
 			}
 		}
 
-		//System.out.println("Exiting WorkerConnectionListener");
+		logger.debug("Exiting WorkerConnectionListener");
 	}
 
 	void shutdown() {

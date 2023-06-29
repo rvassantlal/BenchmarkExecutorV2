@@ -1,5 +1,7 @@
 package controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.Configuration;
 
 import java.io.IOException;
@@ -8,6 +10,7 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
 public class BenchmarkController extends Thread {
+	private final Logger logger = LoggerFactory.getLogger("benchmark.controller");
 	private final IBenchmarkStrategy benchmarkStrategy;
 	private final WorkerConnectionListener workerConnectionListener;
 	private final WorkerHandler[] workerHandlers;
@@ -44,12 +47,11 @@ public class BenchmarkController extends Thread {
 
 		benchmarkStrategy.executeBenchmark(workerHandlers, configuration.getBenchmarkParameters());
 		shutdown();
-		System.out.println("Exiting BenchmarkController");
+		logger.debug("Exiting BenchmarkController");
 	}
 
 	void addNewWorker(Socket connection) throws IOException {
-		System.out.printf("Received connection from %s:%d\n",
-				connection.getInetAddress().getHostAddress(),
+		logger.info("Received connection from {}:{}\n", connection.getInetAddress().getHostAddress(),
 				connection.getPort());
 		WorkerHandler workerHandler = new WorkerHandler(workerHandlerIndex, connection);
 		workerHandlers[workerHandlerIndex++] = workerHandler;

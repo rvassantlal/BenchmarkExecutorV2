@@ -1,11 +1,15 @@
 package worker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class ProcessInstance extends Thread {
+	private final Logger logger = LoggerFactory.getLogger("benchmark.worker");
 	private final EventTrigger eventTrigger;
 	private final IWorkerEventProcessor eventProcessor;
 	private final Process process;
@@ -16,7 +20,7 @@ public class ProcessInstance extends Thread {
 		super("Worker Thread");
 		this.eventTrigger = eventTrigger;
 		this.eventProcessor = eventProcessor;
-		System.out.printf("Executing '%s'\n", command);
+		logger.info("Executing '{}' in '{}'", command, workingDir);
 		this.process = Runtime.getRuntime().exec(command, null, new File(workingDir));
 	}
 
@@ -27,7 +31,7 @@ public class ProcessInstance extends Thread {
 		try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 			String line;
 			while ((line = in.readLine()) != null) {
-				//System.out.println(line);
+				logger.debug("{}", line);
 				eventProcessor.process(line);
 				if (!isReady && eventProcessor.isReady()) {
 					isReady = true;
