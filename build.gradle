@@ -19,8 +19,15 @@ jar {
 distributions {
 	main {
 		contents{
-			from 'benchmark.config'
-			from jar
+			into('config') {
+				from 'config'
+			}
+			into('lib') {
+				from jar
+				from(configurations.runtimeClasspath)
+			}
+			from 'runscripts/run.cmd'
+			from 'runscripts/run.sh'
 		}
 	}
 }
@@ -30,5 +37,6 @@ repositories {
 }
 
 dependencies {
-
+	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+	implementation 'org.slf4j:slf4j-api:1.7.32'
 }
