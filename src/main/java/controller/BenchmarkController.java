@@ -51,7 +51,7 @@ public class BenchmarkController extends Thread {
 	}
 
 	void addNewWorker(Socket connection) throws IOException {
-		logger.info("Received connection from {}:{}\n", connection.getInetAddress().getHostAddress(),
+		logger.info("Received connection from {}:{}", connection.getInetAddress().getHostAddress(),
 				connection.getPort());
 		WorkerHandler workerHandler = new WorkerHandler(workerHandlerIndex, connection);
 		workerHandlers[workerHandlerIndex++] = workerHandler;
