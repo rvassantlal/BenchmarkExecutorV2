@@ -32,9 +32,9 @@
 		<appender-ref ref="MIN-STDERR"/>
 	</root>
 
-	<logger name="benchmark.controller" level="INFO">
-	</logger>
+	<logger name="benchmark.controller" level="INFO"/>
 
-	<logger name="benchmark.worker" level="INFO">
-	</logger>
+	<logger name="benchmark.worker" level="INFO"/>
+
+	<logger name="benchmark.worker.process" level="INFO"/>
 </configuration>

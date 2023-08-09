@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
  */
 public class ErrorMonitor extends Thread {
     private final Logger logger = LoggerFactory.getLogger("benchmark.worker");
+	private final Logger processLogger = LoggerFactory.getLogger("benchmark.worker.process");
     private final InputStream errorStream;
     private final EventTrigger eventTrigger;
 
@@ -28,7 +29,7 @@ public class ErrorMonitor extends Thread {
                      new BufferedReader(new InputStreamReader(errorStream))) {
             String line;
             while ((line = in.readLine()) != null) {
-                logger.error(line);
+				processLogger.error(line);
                 eventTrigger.error(line);
             }
         } catch (IOException ignored) {}

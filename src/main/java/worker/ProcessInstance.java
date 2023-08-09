@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 
 public class ProcessInstance extends Thread {
 	private final Logger logger = LoggerFactory.getLogger("benchmark.worker");
+	private final Logger processLogger = LoggerFactory.getLogger("benchmark.worker.process");
 	private final EventTrigger eventTrigger;
 	private final IWorkerEventProcessor eventProcessor;
 	private final Process process;
@@ -31,7 +32,7 @@ public class ProcessInstance extends Thread {
 		try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 			String line;
 			while ((line = in.readLine()) != null) {
-				logger.debug("{}", line);
+				processLogger.debug("{}", line);
 				eventProcessor.process(line);
 				if (!isReady && eventProcessor.isReady()) {
 					isReady = true;
@@ -45,6 +46,7 @@ public class ProcessInstance extends Thread {
 		} finally {
 			errorMonitor.interrupt();
 		}
+		logger.debug("Exiting ProcessInstance");
 	}
 
 	void changeProcessingStateTo(boolean value) {

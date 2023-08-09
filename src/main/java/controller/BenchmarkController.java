@@ -36,7 +36,7 @@ public class BenchmarkController extends Thread {
 		try {
 			areWorkersConnected.await();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error("BenchmarkController interrupted while waiting for workers to connect", e);
 		}
 
 		Configuration configuration = Configuration.getInstance();
