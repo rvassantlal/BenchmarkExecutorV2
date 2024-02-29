@@ -23,13 +23,13 @@ public class DefaultMeasurementEventProcessor implements IMeasurementEventProces
 	@Override
 	public void process(String line) {
 		if (line.contains(DEFAULT_MEASUREMENT_PATTERN)) {
-			String[] tokens = line.split(":");
-			String[] keyTokens = tokens[0].split(DEFAULT_MEASUREMENT_PATTERN);
-			String key = keyTokens[keyTokens.length - 1];
+			String[] tokens = line.split(DEFAULT_MEASUREMENT_PATTERN);
+			String[] dataTokens = tokens[tokens.length - 1].split(":");
+			String key = dataTokens[0];
 			if (!rawMeasurements.containsKey(key)) {
 				rawMeasurements.put(key, new LinkedList<>());
 			}
-			rawMeasurements.get(key).add(tokens[1].trim());
+			rawMeasurements.get(key).add(dataTokens[dataTokens.length - 1].trim());
 		}
 
 	}
